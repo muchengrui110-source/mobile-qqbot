@@ -17,10 +17,10 @@ links = {
     'dsh-qq-bridge': '/root/dsh-plugins/dsh-qq-bridge',
     'dsh-persona': '/root/dsh-plugins/dsh-persona',
     'dsh-qbot-launcher': '/root/dsh-plugins/dsh-qbot-launcher',
+    'dsh-mnemon': '/root/dsh-plugins/dsh-mnemon',
 }
 for name, target in links.items():
     deps[name] = 'link:' + target
-deps['dsh-mnemon'] = '0.5.39'
 
 bundles = pkg.setdefault('dsh', {}).setdefault('profile', {}).setdefault('bundles', [])
 for name in ('dsh-qq-bridge', 'dsh-persona', 'dsh-qbot-launcher', 'dsh-mnemon'):

@@ -11,7 +11,7 @@
 | `yogurt/` | 协议端（Yogurt，arm64 可执行） |
 | `m2o/` | Milky → OneBot v11 转换器（Python） |
 | `console/` | 手机浏览器控制台（状态 / 启停 / 人设 / 记忆 / 日志） |
-| `plugins/` | DSH 插件：QQ 桥接、身份与人设、开机自启 |
+| `plugins/` | DSH 插件：QQ 桥接、身份与人设、长期记忆、开机自启 |
 | `start.sh` | 一键启动全部组件，登录过期时把二维码存进相册 |
 | `showqr.sh` | 单独把当前二维码存进相册 |
 

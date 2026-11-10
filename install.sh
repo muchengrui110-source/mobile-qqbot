@@ -30,7 +30,7 @@ print('uin =', uin)
 PY
 
 echo "== 安装插件 =="
-for p in dsh-qq-bridge dsh-persona dsh-qbot-launcher; do
+for p in dsh-qq-bridge dsh-persona dsh-qbot-launcher dsh-mnemon; do
   rm -rf "/root/dsh-plugins/$p"
   cp -r "$SRC/plugins/$p" "/root/dsh-plugins/$p"
 done
