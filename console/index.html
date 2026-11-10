@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>QQ 机器人控制台</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; padding: 12px 12px 40px; font: 15px/1.5 system-ui, "PingFang SC", "Microsoft YaHei", sans-serif; background: #0f1115; color: #e6e9ef; }
+  h1 { font-size: 17px; margin: 4px 0 12px; font-weight: 600; }
+  .card { background: #171a21; border: 1px solid #232a35; border-radius: 14px; padding: 12px; margin-bottom: 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 7px; }
+  .on { background: #35c46b; } .off { background: #6b7280; } .warn { background: #e0a11b; }
+  .muted { color: #8b95a7; font-size: 13px; }
+  button { font: inherit; border-radius: 12px; border: 1px solid #2c3648; background: #202836; color: #e6e9ef; padding: 11px 14px; }
+  button.primary { background: #2f6df6; border-color: #2f6df6; color: #fff; }
+  button.danger { background: #3a1f24; border-color: #5c2b33; color: #ffb3bd; }
+  .btns { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .tabs button { flex: 1; padding: 9px 0; font-size: 14px; }
+  .tabs button.active { background: #2f6df6; border-color: #2f6df6; color: #fff; }
+  select, textarea { width: 100%; font: inherit; background: #10141b; color: #e6e9ef; border: 1px solid #2c3648; border-radius: 10px; padding: 10px; }
+  textarea { min-height: 260px; line-height: 1.55; }
+  pre { white-space: pre-wrap; word-break: break-all; font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; background: #0c0f14; border: 1px solid #232a35; border-radius: 10px; padding: 10px; max-height: 46vh; overflow: auto; }
+  .hide { display: none; }
+  .msg { font-size: 13px; color: #8b95a7; margin-top: 6px; }
+  .list button { width: 100%; text-align: left; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<h1>QQ 机器人控制台</h1>
+
+<div class="tabs">
+  <button id="tab-status" class="active" onclick="showTab('status')">状态</button>
+  <button id="tab-persona" onclick="showTab('persona')">人设</button>
+  <button id="tab-memory" onclick="showTab('memory')">记忆</button>
+  <button id="tab-logs" onclick="showTab('logs')">日志</button>
+</div>
+
+<section id="pane-status">
+  <div class="card">
+    <div class="row"><span>签名服务</span><span id="s-sign">…</span></div>
+    <div class="row"><span>协议端 (Yogurt)</span><span id="s-yogurt">…</span></div>
+    <div class="row"><span>转换器 (m2o)</span><span id="s-m2o">…</span></div>
+    <div class="row"><span>桥接插件</span><span id="s-bridge">…</span></div>
+    <div class="row"><span>QQ 登录</span><span id="s-qq">…</span></div>
+    <div class="muted" id="s-ports"></div>
+  </div>
+  <div class="card">
+    <div class="row"><span>操作</span></div>
+    <div class="btns">
+      <button class="primary" onclick="act('start')">启动</button>
+      <button onclick="act('restart')">重启</button>
+      <button class="danger" onclick="act('stop')">停止</button>
+    </div>
+    <div class="msg" id="act-msg"></div>
+  </div>
+</section>
+
+<section id="pane-persona" class="hide">
+  <div class="card">
+    <div class="row"><span>会话</span></div>
+    <select id="p-chat" onchange="loadPersona()"></select>
+    <div class="row" style="margin-top:8px"><span>模式</span></div>
+    <select id="p-mode" onchange="fillMode()"></select>
+    <div class="row" style="margin-top:8px"><span>设为当前生效</span><input type="checkbox" id="p-active" /></div>
+    <textarea id="p-prompt" placeholder="这里是人设正文"></textarea>
+    <div class="btns">
+      <button class="primary" onclick="savePersona()">保存</button>
+      <button onclick="loadPersona()">重新读取</button>
+    </div>
+    <div class="msg" id="p-msg"></div>
+  </div>
+</section>
+
+<section id="pane-memory" class="hide">
+  <div class="card">
+    <div class="row"><span>记忆库文件</span><button onclick="loadMemory()">刷新</button></div>
+    <div class="list" id="m-list"></div>
+  </div>
+  <div class="card">
+    <div class="row"><span>内容</span></div>
+    <pre id="m-text">点上面的文件看内容</pre>
+  </div>
+</section>
+
+<section id="pane-logs" class="hide">
+  <div class="card">
+    <div class="btns">
+      <button onclick="loadLog('sign')">签名</button>
+      <button onclick="loadLog('yogurt')">协议端</button>
+      <button onclick="loadLog('m2o')">转换器</button>
+    </div>
+    <pre id="l-text" style="margin-top:10px">选一个看</pre>
+  </div>
+</section>
+
+<script>
+function showTab(name) {
+  for (const k of ['status', 'persona', 'memory', 'logs']) {
+    document.getElementById('pane-' + k).classList.toggle('hide', k !== name);
+    document.getElementById('tab-' + k).classList.toggle('active', k === name);
+  }
+  if (name === 'status') loadStatus();
+  if (name === 'persona') loadPersonaList();
+  if (name === 'memory') loadMemory();
+}
+
+function badge(el, on, textOn, textOff, warn) {
+  const dot = '<span class="dot ' + (on ? (warn ? 'warn' : 'on') : 'off') + '"></span>';
+  el.innerHTML = dot + (on ? textOn : textOff);
+}
+
+async function loadStatus() {
+  try {
+    const r = await fetch('/api/status').then((x) => x.json());
+    badge(document.getElementById('s-sign'), r.sign, '运行中', '没跑');
+    badge(document.getElementById('s-yogurt'), r.yogurt, '运行中', '没跑');
+    badge(document.getElementById('s-m2o'), r.m2o, '运行中', '没跑');
+    badge(document.getElementById('s-bridge'), r.bridge, '在听 3002', '没连接');
+    const qq = document.getElementById('s-qq');
+    if (r.online) badge(qq, true, '已上线', '', false);
+    else if (r.waitingQr) badge(qq, true, '等扫码', '', true);
+    else badge(qq, false, '未知', '未登录', true);
+    document.getElementById('s-ports').textContent = '监听端口：' + (r.ports.join(' ') || '无');
+  } catch (e) {
+    document.getElementById('act-msg').textContent = '状态读取失败：' + e.message;
+  }
+}
+
+async function act(what) {
+  const msg = document.getElementById('act-msg');
+  msg.textContent = '执行中…';
+  await fetch('/api/action', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ do: what }) });
+  msg.textContent = '已发送：' + what + '（几秒后看状态）';
+  setTimeout(loadStatus, 4000);
+}
+
+let personaData = null;
+
+async function loadPersonaList() {
+  const r = await fetch('/api/persona').then((x) => x.json());
+  const sel = document.getElementById('p-chat');
+  sel.innerHTML = '';
+  if (!r.ok) { document.getElementById('p-msg').textContent = r.error || '读取失败'; return; }
+  for (const c of r.chats) {
+    const opt = document.createElement('option');
+    opt.value = c.key;
+    opt.textContent = c.key + '（当前：' + (c.active || '无') + '）';
+    sel.appendChild(opt);
+  }
+  if (r.chats.length) loadPersona();
+}
+
+async function loadPersona() {
+  const key = document.getElementById('p-chat').value;
+  if (!key) return;
+  const r = await fetch('/api/persona?chat=' + encodeURIComponent(key)).then((x) => x.json());
+  if (!r.ok) { document.getElementById('p-msg').textContent = r.error || '读取失败'; return; }
+  personaData = r;
+  const modeSel = document.getElementById('p-mode');
+  modeSel.innerHTML = '';
+  for (const name of Object.keys(r.modes)) {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    modeSel.appendChild(opt);
+  }
+  if (r.active && r.modes[r.active]) modeSel.value = r.active;
+  fillMode();
+}
+
+function fillMode() {
+  if (!personaData) return;
+  const mode = document.getElementById('p-mode').value;
+  const item = personaData.modes[mode] || {};
+  document.getElementById('p-prompt').value = item.prompt || '';
+  document.getElementById('p-active').checked = (personaData.active === mode);
+  document.getElementById('p-msg').textContent = '';
+}
+
+async function savePersona() {
+  const body = {
+    chatKey: document.getElementById('p-chat').value,
+    mode: document.getElementById('p-mode').value,
+    prompt: document.getElementById('p-prompt').value,
+    active: document.getElementById('p-active').checked ? document.getElementById('p-mode').value : '',
+  };
+  const r = await fetch('/api/persona', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then((x) => x.json());
+  document.getElementById('p-msg').textContent = r.ok ? '已保存，下一条消息生效' : ('保存失败：' + (r.error || ''));
+}
+
+async function loadMemory() {
+  const r = await fetch('/api/memory').then((x) => x.json());
+  const list = document.getElementById('m-list');
+  list.innerHTML = '';
+  const add = (label, path, size) => {
+    const b = document.createElement('button');
+    b.textContent = label + '  ' + Math.round(size / 1024) + 'K';
+    b.onclick = () => viewFile(path);
+    list.appendChild(b);
+  };
+  for (const f of r.files || []) add(f.path.replace('/root/.mnemon/', ''), f.path, f.size);
+  for (const f of r.qqWorkspaces || []) add('[QQ工作区] ' + f.path.replace('/root/.dsh/qq-workspaces/', ''), f.path, f.size);
+  if (!(r.files || []).length && !(r.qqWorkspaces || []).length) list.textContent = '还没有记忆文件（机器人聊过之后才会生成）';
+}
+
+async function viewFile(path) {
+  const r = await fetch('/api/memory?file=' + encodeURIComponent(path)).then((x) => x.json());
+  document.getElementById('m-text').textContent = r.ok ? r.text : (r.error || '读不到');
+}
+
+async function loadLog(name) {
+  const r = await fetch('/api/logs?name=' + name).then((x) => x.json());
+  document.getElementById('l-text').textContent = r.ok ? r.text : '读不到';
+}
+
+loadStatus();
+setInterval(() => { if (!document.getElementById('pane-status').classList.contains('hide')) loadStatus(); }, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# ============================================================================
+# dsh-persona —— DSH bundle patch
+# ============================================================================
+# 设置里多一页「身份与人设」：
+#   - 改 QQ 桥接的人格文件：D:\napcat\qq-bridge\personas.json
+#   - 从互联网学习角色（1.1）：输入角色名 → 抓萌娘/360百科/搜索 → 当前模型提炼
+#     学出来的角色存在 personas.json 的 characters 里，再套用成某个会话的模式。
+#   - 说话习惯（1.2）：在 DSH 里聊天时统计你每条多少字、怎么断句（只存数字不存原话），
+#     攒够 8 条生成节奏提示，可以一键追加到某个会话模式。
+#
+# 想换文件位置就改下面 config.personaFile（改完重启 DSH 生效）。
+# 说话习惯默认写到 personaFile 旁边的 speech-habits.json，可用 config.speechFile 改。
+# 想让学习固定用某个模型，可以在 config 里写 provider / model；不写就用当前默认模型。
+#
+# ⚠️ `name:` 必须与安装后的包名完全一致（这里是 dsh-persona）。
+# ============================================================================
+
+- insert:
+    - id: dsh-persona
+      name: dsh-persona
+      config:
+        personaFile: 'D:\napcat\qq-bridge\personas.json'
+        # speechFile: 'D:\napcat\qq-bridge\speech-habits.json'
+        # provider: deepseek-account
+        # model: deepseek-flash

@@ -1,0 +1,40 @@
+{
+  "name": "dsh-persona",
+  "version": "1.4.0",
+  "private": true,
+  "description": "身份与人设：DSH 设置里的「身份与人设」页，直接编辑 QQ 桥接的 personas.json。默认人格是「蓝色大肥鱼」（DeepSeek 鲸鱼娘二创）；模式支持三段式（是谁 / 什么时候开口 / 怎么说话）+ 备用风格随机换，老的一整段文字格式照样能用、可一键拆成三段；还能给一个角色名，自动从互联网学习人设和说话方式。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "templates/*.json",
+    "locale/*.json",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "persona",
+    "qq-bridge"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "license": "MIT"
+}

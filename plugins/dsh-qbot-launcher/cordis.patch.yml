@@ -1,0 +1,5 @@
+# dsh-qbot-launcher —— 引擎启动时自动拉起 QQ 机器人后端
+
+- insert:
+    - id: qbot-launcher
+      name: dsh-qbot-launcher

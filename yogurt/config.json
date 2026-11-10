@@ -1,0 +1,38 @@
+{
+    "configVersion": 3,
+    "protocol": {
+        "uin": 0,
+        "password": "",
+        "os": "Linux",
+        "version": "custom",
+        "signApiUrl": "http://127.0.0.1:8080/",
+        "pcLagrangeSignToken": "",
+        "androidUseLegacySign": false,
+        "autoRenewSession": true
+    },
+    "milky": {
+        "http": {
+            "host": "127.0.0.1",
+            "port": 3000,
+            "prefix": "",
+            "accessToken": "",
+            "corsOrigins": []
+        },
+        "webhook": {
+            "endpoints": []
+        },
+        "reportSelfMessage": true,
+        "preloadContacts": false,
+        "ffmpegPath": ""
+    },
+    "logging": {
+        "ansiLevel": "ANSI256",
+        "coreLogLevel": "DEBUG"
+    },
+    "security": {
+        "skipOnLaunchListenAddressCheck": false
+    },
+    "debug": {
+        "enableFaceDetailsApi": false
+    }
+}

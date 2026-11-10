@@ -1,0 +1,13 @@
+{
+  "name": "dsh-qbot-launcher",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DSH 插件：引擎启动时自动把 QQ 机器人后端（签名服务 / 协议端 / 转换器）和控制台拉起来，省得每次手动敲命令。",
+  "type": "module",
+  "main": "index.js",
+  "exports": { ".": "./index.js", "./package.json": "./package.json" },
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" }
+  },
+  "license": "MIT"
+}
